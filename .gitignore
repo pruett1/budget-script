@@ -1,0 +1,20 @@
+#project specific folders
+## folder containing scraping instructions
+/instructions/
+## scraped downloaded_files
+downloaded_files/
+## generated reports
+reports/
+## test jupyter notebook
+test.ipynb
+## launchd job related
+/job/
+
+#python files
+**/__pycache__/
+*.egg-info
+build/
+dist/
+
+#other
+.vscode/
