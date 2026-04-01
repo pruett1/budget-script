@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=65.5.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "budget-app-service"
+version = "0.1.0"
+description = "Budget automization tool"
+authors = [{ name = "Spencer Pruett" }]
+readme = "README.md"
+
+requires-python = ">=3.14"
+dependencies = [
+    "selenium~=4.31.0",
+    "seleniumbase~=4.37.4",
+    "pandas>=3.0.1",
+    "rich>=14.3.3"
+]
