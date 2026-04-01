@@ -1,0 +1,33 @@
+{
+    "accounts": [
+        {
+            "name": "amex",
+            "type": "credit-card",
+            "scraping_actions": [
+                {"action": "navigate", "base_url": "https://global.americanexpress.com/spending-report/"},
+                {"action": "type", "selector": "input#eliloUserID", "value": "USERNAME"},
+                {"action": "type", "selector": "input#eliloPassword", "value": "PASSWORD"},
+                {"action": "click", "selector": "button#loginSubmit"},
+                {"action": "if_is_element", "selector": "button#changeMethod", "actions": [
+                    {"action": "click", "selector": "button#changeMethod"},
+                    {"action": "wait_for_element", "selector": "fieldset[data-testid='challenge-options-list']"},
+                    {"action": "find_by_xpath", "selector": "//h3[contains(text(), '(SMS)')]/ancestor::button[1]"},
+                    {"action": "click", "selector": "temp"},
+                    {"action": "wait_for_mfa", "duration": 15},
+                    {"action": "type", "selector": "input#question-value", "value": "temp"},
+                    {"action": "find_by_xpath", "selector": "//span[contains(text(), 'Verify')]"},
+                    {"action": "click", "selector": "temp"},
+                    {"action": "click", "selector": "button#submitBtn"}
+                ], "duration": 10, "poll_interval": 0.5},
+                {"action": "navigate", "base_url": "https://global.americanexpress.com/spending-report/", "endpoint": "custom?from={START}&to={END}"},
+                {"action": "if_is_element", "selector": "a#trigger-download-menu-icon", "actions": [
+                    {"action": "click", "selector": "a#trigger-download-menu-icon"},
+                    {"action": "wait_for_element", "selector": "label[for='axp-activity-download-body-selection-options-type_csv']"},
+                    {"action": "click", "selector": "label[for='axp-activity-download-body-selection-options-type_csv']"},
+                    {"action": "click", "selector": "label[for='axp-activity-download-body-checkbox-options-includeAll']"},
+                    {"action": "click", "selector": "a[data-test-id='axp-activity-download-footer-download-confirm']"}
+                ], "fail_if_else": true, "duration": 10, "poll_interval": 0.5}
+            ]
+        }
+    ]
+}

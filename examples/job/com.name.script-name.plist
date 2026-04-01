@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" 
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+
+<plist version="1.0">
+<dict>
+
+    <!-- Unique name -->
+    <key>Label</key>
+    <string>com.name.script-name</string>
+
+    <!-- What to run -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/path/to/dir/job/run_script.sh</string>
+    </array>
+
+    <!-- Run schedule -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Day</key>
+        <integer>1</integer>
+        <key>Hour</key>
+        <integer>12</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- Logs -->
+    <key>StandardOutPath</key>
+    <string>/path/to/dir/job/launchd.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/path/to/dir/job/launchd.err.log</string>
+
+    <!-- Run when loaded -->
+    <key>RunAtLoad</key>
+    <false/>
+
+</dict>
+</plist>

@@ -1,0 +1,54 @@
+{
+    "amex_credit-card": {
+        "filter": {
+            "method": "operator",
+            "logic": {
+                "column_name": "amount",
+                "operator": ">=",
+                "value": 0
+            }
+        },
+        "changes": [
+            {
+                "method": "column_rename",
+                "logic": {
+                    "target_col": "category",
+                    "new_name": "txn_type"
+                }
+            },
+            {
+                "method": "add_column",
+                "logic": {
+                    "new_col": "category",
+                    "value": ""
+                }
+            },
+            {
+                "method": "map_values",
+                "logic": {
+                    "mapping_method": "func",
+                    "map": "lambda x: -1 * x",
+                    "mask_col": "amount",
+                    "mask_op": "<=",
+                    "mask_val": "0",
+                    "target_col": "amount"
+                }
+            },
+            {
+                "method": "map_values",
+                "logic": {
+                    "mapping_method": "dict",
+                    "map": {
+                        "Merchandise & Supplies-Groceries": "Necessity",
+                        "Merchandise & Supplies-Wholesale Stores": "Necessity",
+                        "Transportation-Fuel": "Necessity",
+                        "Transportation-Rail Services": "Necessity"
+                    },
+                    "mask_col": "txn_type",
+                    "target_col": "category",
+                    "default": "Discretionary"
+                }
+            }
+        ]
+    }
+}
