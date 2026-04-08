@@ -93,7 +93,7 @@ This instantiation can be found on line 22 of __*scraper.py*__. No other changes
 
 | Action Name | Required Keys | Optional Keys | Return Value | Notes |
 | :--- | :--- | :--- | :--- | --- |
-| navigate | base_url | endpoint, format | None | Using {START} and {END} will be replaced with the corresponding start and end date of the script (can be formatted using the format key) |
+| navigate | base_url | endpoint, format | None | using {START} and {END} will be replaced with the corresponding start and end date of the script (can be formatted using the format key) |
 | type | selector, value | format | None | supports the following special typing: <ul><li>temp, will be replaced by the return value of the previous step if exists</li> <li>{START} and {END}, will be replaced with the corresponding start and end date of the script (can be formatted using the format key)</li></ul> |
 | click | selector | - | None | if the selector is "temp" it will be replaced by the return value of the previous step |
 | find_by_xpath | selector | - | Found Element | - |
