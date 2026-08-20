@@ -1,3 +1,4 @@
+from selenium.common import NoSuchElementException
 from seleniumbase import SB
 from selenium.webdriver.common.by import By
 import os
@@ -68,8 +69,7 @@ class Scraper:
             case "click":
                 return self.click(action_obj)
             case "find_by_xpath":
-                self.assert_required_keys(action_obj, ["selector"])
-                return self.sb.find_element(By.XPATH, action_obj["selector"])
+                return self.find_by_xpath(action_obj)
             case "wait_for_mfa":
                 return self.wait_for_mfa(action_obj)
             case "wait_for_element":
@@ -81,6 +81,11 @@ class Scraper:
             case "sleep":
                 self.assert_required_keys(action_obj, ["duration"])
                 time.sleep(action_obj["duration"])
+            case "switch_to_frame":
+                self.assert_required_keys(action_obj, ["selector"])
+                self.sb.switch_to_frame(action_obj["selector"])
+            case "switch_to_default_content":
+                self.sb.switch_to_default_content()
             case _:
                 raise ValueError(f"Unsupported action: {action}")
             
@@ -126,6 +131,10 @@ class Scraper:
         self.sb.click(action_obj["selector"])
         return None
     
+    def find_by_xpath(self, action_obj):
+        self.assert_required_keys(action_obj, ["selector"])
+        return self.sb.find_element(By.XPATH, action_obj["selector"])
+    
     def wait_for_mfa(self, action_obj):
         self.assert_required_keys(action_obj, ["duration"])
         duration = action_obj["duration"]
@@ -142,6 +151,9 @@ class Scraper:
         self.assert_required_keys(action_obj, ["selector", "actions"])
         if "duration" in action_obj:
             self.assert_required_keys(action_obj, ["duration", "poll_interval"])
+
+        if "iframe" in action_obj:
+            self.sb.switch_to_frame(action_obj["iframe"])
 
         selector = action_obj["selector"]
         fail_if_else = action_obj.get("fail_if_else", False)
@@ -161,6 +173,9 @@ class Scraper:
         if fail_if_else and not actions_performed:
             self.logger.error(f"Element {selector} is not present and fail_if_else True")
             raise ValueError()
+        
+        if "iframe" in action_obj:
+            self.sb.switch_to_default_content()
         
         return None
 

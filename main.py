@@ -40,6 +40,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--date', nargs="+", help="Provide one date (end) or two dates (start end) in YYYY-MM-DD format (default start date is beginning of month)")
     parser.add_argument('-v', '--verbose', action="count", default=0, help="Increase verbosity (-v, -vv): \n-v includes INFO logs and more detailed spending category breakdown, \n-vv includes all debug logs")
     parser.add_argument('-p', '--pretty-report', action="store_true", help="Generate more than just an HTML report")
+    parser.add_argument('--gen-html-report', action="store_true", help="Generate an HTML report with history comparison")
 
     levels = {
         0: logging.ERROR,
@@ -81,3 +82,6 @@ if __name__ == "__main__":
         report_manager.generate_pretty_cli_report(combined)
     else:
         report_manager.generate_cli_report(combined)
+
+    if args.gen_html_report:
+        report_manager.generate_html_report(combined, start_date, end_date)

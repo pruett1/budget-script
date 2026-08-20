@@ -71,7 +71,7 @@ class MessageHandler:
 
             end_time = datetime.now() + timedelta(seconds=duration)
             while datetime.now() < end_time:
-                recent = self.get_messages(lookback_time=poll_interval+0.2) # add some overlap bc of time between calls
+                recent = self.get_messages(lookback_time=poll_interval+0.5) # add some overlap bc of time between calls
                 otp = self.extract_otp(recent, regex_pattern)
                 if otp:
                     self.logger.debug(f"Found OTP: {otp}")

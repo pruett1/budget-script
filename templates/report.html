@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+        .hamburger-menu {
+            cursor: pointer;
+        }
+        .content {
+            padding: 20px;
+        }
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Financial Report</h1>
+        <div class="hamburger-menu" onclick="toggleMenu()">☰</div>
+    </div>
+    <div class="content">
+        <div id="home-view" class="view active">
+            <h2>Budget Summary</h2>
+            <p id="quick-overview">Quick Overview: [Insert Quick Overview Here]</p>
+            <canvas id="category-pie-chart"></canvas>
+        </div>
+        <div id="spending-overview" class="view">
+            <h2>Spending and Transaction Overviews</h2>
+            <p id="top-spending-categories">Top Spending Categories: [Insert Top Spending Categories Here]</p>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Amount</th>
+                        <th>Average Purchase Amount per Visit</th>
+                        <th>Total Number of Visits</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-data">
+                    <!-- Insert Transaction Data Here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function toggleMenu() {
+            const views = document.querySelectorAll('.view');
+            views.forEach(view => view.classList.toggle('active'));
+        }
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/report-data');
+                const data = await response.json();
+
+                // Populate budget summary
+                document.getElementById('quick-overview').textContent = `Quick Overview: ${data.quickOverview}`;
+                const ctx = document.getElementById('category-pie-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: data.categoryPieChart.labels,
+                        datasets: [{
+                            label: 'Categories',
+                            data: data.categoryPieChart.data,
+                            backgroundColor: data.categoryPieChart.backgroundColor
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                enabled: true
+                            }
+                        }
+                    }
+                });
+
+                // Populate spending and transaction overviews
+                document.getElementById('top-spending-categories').textContent = `Top Spending Categories: ${data.topSpendingCategories}`;
+                const transactionData = data.transactionData;
+                const tbody = document.getElementById('transaction-data');
+                tbody.innerHTML = '';
+                transactionData.forEach(transaction => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${transaction.vendor}</td>
+                        <td>${transaction.amount}</td>
+                        <td>${transaction.averagePurchaseAmountPerVisit}</td>
+                        <td>${transaction.totalNumberOfVisits}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchData);
+    </script>
+</body>
+</html>

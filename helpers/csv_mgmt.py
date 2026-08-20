@@ -151,4 +151,5 @@ class CSVManager:
     def get_combined_finances(self):
         common_cols = self.get_common_cols()
 
-        return pd.concat([df[common_cols] for df in self.dfs.values()], ignore_index=True)
+        combined = pd.concat([df[common_cols] for df in self.dfs.values()], ignore_index=True)
+        combined.to_csv(self.report_dir + "/combined_finances.csv", index=False)

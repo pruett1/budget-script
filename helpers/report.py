@@ -6,6 +6,9 @@ from rich import box
 from rich.panel import Panel
 from rich.progress_bar import ProgressBar
 from rich.columns import Columns
+from jinja2 import Environment, FileSystemLoader
+import os
+from datetime import datetime
 
 class ReportManager:
     def __init__(self, args, logger):
@@ -214,3 +217,61 @@ class ReportManager:
         console.print(Align.center(Columns([freq_table_panel, health_panel])))
         console.print()
         console.print(top_panel)
+
+    def generate_html_report(self, combined: pd.DataFrame, start_date: datetime | None, end_date: datetime):
+        self.logger.info("Generating HTML report...")
+
+        vals = self.caclulate_values(combined)
+        spending_sub_cat, _ = self.group_spending(combined)
+        freqs, percent_freqs = self.highest_frequency_origins(combined)
+
+        # Prepare data for HTML template
+        report_data = {
+            "start_date": start_date if start_date else end_date.replace(day=1).strftime("%Y-%m-%d"),
+            "end_date": end_date.strftime("%Y-%m-%d"),
+            "summary": [
+                {"category": "Income", "total": self.fmt_money(vals['income']), "percent_income": "-"},
+                {"category": "Necessities", "total": self.fmt_money(vals['necessities'][0]), "percent_income": self.fmt_percent(vals['necessities'][1])},
+                {"category": "Discretionary", "total": self.fmt_money(vals['discretionary'][0]), "percent_income": self.fmt_percent(vals['discretionary'][1])},
+                {"category": "Savings", "total": self.fmt_money(vals['savings'][0]), "percent_income": self.fmt_percent(vals['savings'][1])},
+                {"category": "Remaining", "total": self.fmt_money(vals['remaining'][0]), "percent_income": self.fmt_percent(vals['remaining'][1])}
+            ],
+            "top_spending": [
+                {
+                    "rank": i,
+                    "category": row["category"],
+                    "sub_category": row["sub-category"],
+                    "amount": self.fmt_money(row["amount"]),
+                    "percent_income": self.fmt_percent(row["amount"] / vals['income'] if vals['income'] != 0 else 0)
+                }
+                for i, (_, row) in enumerate(spending_sub_cat.head(5).iterrows(), 1)
+            ],
+            "top_origins": [
+                {
+                    "origin": value,
+                    "count": count,
+                    "percent_total_txns": self.fmt_percent(percent)
+                }
+                for value, count in freqs.head().items()
+                for percent in [percent_freqs[value]]
+            ]
+        }
+
+        # Load Jinja2 template
+        env = Environment(loader=FileSystemLoader('templates'))
+        template = env.get_template('report.html')
+
+        # Render HTML
+        html_content = template.render(report_data)
+
+        # Save HTML to file
+
+        report_dir = "reports/monthly_budget_report_" + end_date.strftime("%Y-%m-%d")
+        if start_date:
+            report_dir = "reports/monthly_budget_report_" + start_date.strftime("%Y-%m-%d") + "_" + end_date.strftime("%Y-%m-%d")
+
+        os.makedirs(report_dir, exist_ok=True)
+        with open(os.path.join(report_dir, 'report.html'), 'w') as f:
+            f.write(html_content)
+
+        self.logger.info(f"HTML report saved to {os.path.join(report_dir, 'report.html')}")
